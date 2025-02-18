@@ -1,0 +1,21 @@
+Emma White📍 Chicago, IL | 📧 emma.white@email.com | 📞 (456) 789-0123 | 🔗 LinkedIn
+
+Professional Summary
+
+Data Analyst with some exposure to ML, strong SQL and Python skills, seeking a full-time Data Science role.
+
+Key Skills
+
+SQL, Python, Tableau
+
+Basic Machine Learning
+
+Work Experience
+
+Data Analyst | Startup Co. | 2019 - Present
+
+Created data pipelines and performed SQL queries.
+
+Education & Certifications
+
+🎓 BSc in Computer Science, UC Berkeley
