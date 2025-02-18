@@ -1,0 +1,13 @@
+langchain 
+python-dotenv 
+faiss-cpu 
+langchain_community
+flask
+fastapi 
+uvicorn 
+transformers 
+Flask
+Flask-Cors
+google-generativeai
+python-dotenv
+requests

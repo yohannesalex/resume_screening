@@ -1,0 +1,39 @@
+Jane Smith📍 San Francisco, CA | 📧 jane.smith@email.com | 📞 (234) 567-8901 | 🔗 LinkedIn
+
+Professional Summary
+
+Experienced Data Analyst with strong expertise in Python, SQL, and Tableau, transitioning into Data Science. Skilled in data visualization, statistical modeling, and exploratory data analysis. Passionate about leveraging data-driven decision-making and implementing basic machine learning techniques for business insights.
+
+Key Skills
+
+Python, SQL, R
+
+Machine Learning (Intermediate Level, Scikit-Learn, Pandas)
+
+Data Visualization (Tableau, Power BI, Matplotlib, Seaborn)
+
+Statistical Analysis, Hypothesis Testing, A/B Testing
+
+Basic Cloud Computing (AWS, Google Cloud)
+
+ETL & Data Wrangling
+
+Work Experience
+
+Data Analyst | ABC Analytics | 2018 - Present
+
+Developed forecasting models for financial analysis, improving revenue projections by 20%.
+
+Conducted A/B testing to optimize product pricing, leading to a 15% increase in conversions.
+
+Built interactive dashboards in Tableau and Power BI for executive decision-making.
+
+Business Intelligence Analyst | XYZ Corp | 2016 - 2018
+
+Created data pipelines for marketing analytics, reducing manual reporting efforts by 60%.
+
+Assisted in developing predictive analytics models for customer segmentation.
+
+Education & Certifications
+
+🎓 MSc in Statistics, UCLA🎓 BSc in Mathematics, UC Berkeley📜 Google Data Analytics Professional Certificate📜 SQL for Data Science Certification
