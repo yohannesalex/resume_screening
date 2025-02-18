@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - shared_data:/shared_volume
+    environment:
+      - UPLOAD_DIR=/shared_volume
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672/
+      - MONGODB_URL=mongodb://mongodb:27017/resume_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+      - mongodb
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    volumes:
+      - shared_data:/shared_volume
+    environment:
+      - PYTHONPATH=/app
+      - UPLOAD_DIR=/shared_volume
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672/
+      - MONGODB_URL=mongodb://mongodb:27017/resume_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+      - mongodb
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  shared_data:
+  mongo_data:
+
+networks:
+  app-network:
+    driver: bridge

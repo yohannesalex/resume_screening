@@ -1,0 +1,37 @@
+
+pymongo
+pika
+python-multipart
+pytesseract
+pdf2image
+python-dotenv
+pillow
+python-magic
+scikit-learn
+nltk
+# Core dependencies
+fastapi
+uvicorn
+python-dotenv
+
+# Database
+motor
+
+# Messaging
+aio-pika
+
+# Utilities
+tenacity
+aiofiles
+
+# AI and Processing
+google-generativeai
+PyPDF2
+docx2txt
+pytesseract
+pdf2image
+config
+# Development
+pytest
+pytest-asyncio
+httpx
