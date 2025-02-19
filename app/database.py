@@ -1,8 +1,13 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
 import os
 
-MONGO_URI = os.getenv("MONGODB_URL", "mongodb://mongodb:27017/resume_db")
+# Load environment variables
+MONGO_URI = os.getenv("MONGODB_URL", "mongodb+srv://yohannesabdia:yohannes6460@cluster0.2almc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
-client = AsyncIOMotorClient(MONGO_URI)
-db = client.get_default_database()
+# Connect to MongoDB
+client = MongoClient(MONGO_URI)
+
+
+# Use the specified database
+db = client.resume_db
 results_collection = db["results"]

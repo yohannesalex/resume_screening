@@ -2,9 +2,9 @@ import json
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-from app.generate_job_requirement_values import analyze_job_requirements
-from app.file_reader import extract_text_from_file
-from app.vector_keyword_similarity import calculate_scores
+from generate_job_requirement_values import analyze_job_requirements
+from file_reader import extract_text_from_file
+from vector_keyword_similarity import calculate_scores
 # Load environment variables
 load_dotenv()
 
@@ -39,11 +39,10 @@ def scoreResume(requirement_file_path, resume_file_path):
     scores = calculate_scores(extracted_job_requirement, extracted_applicant_resume)
     keyword_weight = scores['weighted_keyword']
     vector_weight = scores['weighted_vector']
-    
     # Define your analysis prompt.
     prompt = f"""
 {{
-  "task": "Evaluate applicant resume against weighted job requirements and provide scored analysis in JSON format",
+  "task": "Evaluate applicant resume against weighted job requirements and provide scored analysis in JSON format. if the resume is a direct copy of job requirement give it 0 ",
   "inputs": {{
     "job_requirements": "{extracted_job_requirement}",
     "applicant_resume": "{extracted_applicant_resume}",
@@ -86,9 +85,6 @@ def scoreResume(requirement_file_path, resume_file_path):
     "score_breakdown": [
       {{
         "criterion": "string",
-        "weight": "float",
-        "raw_score": "integer",
-        "weighted_score": "float",
         "evidence": ["string array"],
         "missing_elements": ["string array"]
       }}
@@ -102,9 +98,6 @@ def scoreResume(requirement_file_path, resume_file_path):
     "score_breakdown": [
       {{
         "criterion": "Python Experience",
-        "weight": 0.25,
-        "raw_score": 80,
-        "weighted_score": 20.0,
         "evidence": ["5 years Python development listed", "Mentioned Django framework"],
         "missing_elements": ["No AWS Lambda experience"]
       }}
@@ -136,7 +129,6 @@ def scoreResume(requirement_file_path, resume_file_path):
     # Clean the response by removing markdown formatting if any.
     response_text = response.text.replace('```json', '').replace('```', '').strip()
     
-    # Use regex to capture the JSON block.
     match = re.search(r'\{.*\}', response_text, re.DOTALL)
     if match:
         json_str = match.group(0)
@@ -150,16 +142,6 @@ def scoreResume(requirement_file_path, resume_file_path):
         result = json.loads(json_str)
     except json.JSONDecodeError as e:
         raise ValueError(f"Error decoding JSON: {e}\nExtracted text: {json_str}")
-    
     return result , keyword_weight , vector_weight
 
 
-
-# resume_path = "test/resume3.txt"
-# requirement_path = "Screenshotpdf.pdf"
-# llm_outPut , keyword_result , vector_result = scoreResume(requirement_path, resume_path)
-# print(keyword_result)
-
-# llm_result = llm_outPut['overall_score']*0.6
-# final_Score = llm_result + keyword_result + vector_result
-# print(final_Score, llm_outPut['score_breakdown'])

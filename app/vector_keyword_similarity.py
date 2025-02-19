@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from app.file_reader import extract_text_from_file
+from file_reader import extract_text_from_file
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai

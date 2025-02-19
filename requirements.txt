@@ -1,6 +1,4 @@
 
-pymongo
-pika
 python-multipart
 pytesseract
 pdf2image
@@ -13,13 +11,10 @@ nltk
 fastapi
 uvicorn
 python-dotenv
-
-# Database
 motor
 
+aio_pika
 # Messaging
-aio-pika
-
 # Utilities
 tenacity
 aiofiles

@@ -10,6 +10,7 @@ pytesseract.pytesseract.tesseract_cmd = 'tesseract'
 POPPLER_PATH = '/usr/bin'  # Default system path in Linux containers
 
 def extract_text_from_file(file_path):
+
     """
     Extracts text from a file based on its extension.
     Supports plain text, PDF, DOC/DOCX, and image formats.
@@ -32,13 +33,13 @@ def extract_text_from_file(file_path):
             images = convert_from_path(file_path, poppler_path=POPPLER_PATH)  # Specify Poppler path
             for image in images:
                 text += pytesseract.image_to_string(image) + "\n"
-        
         return text
 
 
     elif ext in [".doc", ".docx"]:
         # docx2txt extracts text from DOCX; DOC may need conversion
-        return docx2txt.process(file_path)
+        file_content =docx2txt.process(file_path)
+        return file_content
 
     elif ext in [".png", ".jpg", ".jpeg"]:
         image = Image.open(file_path)

@@ -1,3 +1,60 @@
+# version: '3.8'
+
+# services:
+#   api:
+#     build: .
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - shared_data:/shared_volume
+#     environment:
+#       UPLOAD_DIR: /shared_volume
+#       RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672/
+#       GEMINI_API_KEY: ${GEMINI_API_KEY}
+#       MONGO_URI: ${mongodb+srv://yohannesabdia:yohannes6460@cluster0.2almc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}  # Add MongoDB Atlas connection URI
+#     networks:
+#       - app-network
+#     depends_on:
+#       - rabbitmq
+#     restart: unless-stopped
+
+#   consumer:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile.consumer
+#     volumes:
+#       - shared_data:/shared_volume
+#     networks:
+#       - app-network
+#     environment:
+#       PYTHONPATH: ./app
+#       MONGO_URI: ${mongodb+srv://yohannesabdia:yohannes6460@cluster0.2almc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}  # Use MongoDB Atlas
+#     env_file:
+#       - .env
+#     depends_on:
+#       - rabbitmq
+#     restart: unless-stopped
+
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     volumes:
+#       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+#     networks:
+#       - app-network
+#     environment:
+#       RABBITMQ_DEFAULT_USER: admin
+#       RABBITMQ_DEFAULT_PASS: admin
+#     ports:
+#       - "5672:5672"
+#       - "15672:15672"
+#     restart: unless-stopped
+
+# volumes:
+#   shared_data:
+
+# networks:
+#   app-network:
+#     driver: bridge
 version: '3.8'
 
 services:
@@ -5,62 +62,35 @@ services:
     build: .
     ports:
       - "8000:8000"
-    volumes:
-      - shared_data:/shared_volume
     environment:
-      - UPLOAD_DIR=/shared_volume
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672/
-      - MONGODB_URL=mongodb://mongodb:27017/resume_db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - MONGODB_URL=${MONGODB_ATLAS_URL}  # From .env file
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-    networks:
-      - app-network
+    volumes:
+      - shared_volume:/shared_volume
     depends_on:
       - rabbitmq
-      - mongodb
 
   consumer:
-    build:
-      context: .
-      dockerfile: Dockerfile.consumer
-    volumes:
-      - shared_data:/shared_volume
+    build: .
+    command: python consumer.py
     environment:
-      - PYTHONPATH=/app
-      - UPLOAD_DIR=/shared_volume
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672/
-      - MONGODB_URL=mongodb://mongodb:27017/resume_db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - MONGODB_URL=${MONGODB_ATLAS_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-    networks:
-      - app-network
+    volumes:
+      - shared_volume:/shared_volume
     depends_on:
       - rabbitmq
-      - mongodb
 
   rabbitmq:
-    image: rabbitmq:3-management
-    volumes:
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+    image: rabbitmq:3.9-management
     ports:
       - "5672:5672"
       - "15672:15672"
-
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
     volumes:
-      - mongo_data:/data/db
-    networks:
-      - app-network
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
-  shared_data:
-  mongo_data:
-
-networks:
-  app-network:
-    driver: bridge
+  shared_volume:
+  rabbitmq_data:
