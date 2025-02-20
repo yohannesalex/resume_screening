@@ -6,6 +6,8 @@ from screening import scoreResume
 from models import ApplicationResult
 import aio_pika
 from concurrent.futures import ThreadPoolExecutor
+from generate_skill_for_interview import analyse_job_skills
+from file_reader import extract_text_from_file
 
 executor = ThreadPoolExecutor()
 
@@ -21,6 +23,8 @@ async def process_message(message: aio_pika.IncomingMessage):
                 data['job_requirements_path'],
                 data['resume_path']
             )
+            job_text = extract_text_from_file(data['job_requirements_path'])
+            skill_fetch = analyse_job_skills(job_text)
             final_score = (llm_output['overall_score'] * 0.6) + kw_score + vec_score
 
             result = {
@@ -28,7 +32,8 @@ async def process_message(message: aio_pika.IncomingMessage):
                 "job_id": data['job_id'],
                 "final_score": round(final_score, 1),
                 "score_breakdown": llm_output['score_breakdown'],
-                "details": llm_output
+                "details": llm_output,
+                "required_skills": skill_fetch
             }
 
             # Save to MongoDB
