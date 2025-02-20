@@ -1,4 +1,4 @@
-from config import Config
+from config_local import Config
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 import uuid
@@ -49,8 +49,8 @@ async def submit_application(
         raise HTTPException(500, detail=str(e))
 
 @app.get("/results/{application_id}")
-def get_results(application_id: str):  # Remove async
-    result = ApplicationResult.get_by_id(application_id)  # Synchronous call
+def get_results(application_id: str):  
+    result = ApplicationResult.get_by_id(application_id)  
     if not result:
         raise HTTPException(status_code=404, detail="Application not found")
     return result

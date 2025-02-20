@@ -123,14 +123,3 @@ def calculate_scores(job_text, resume_text):
         "matched_keywords": list(set(keywords['resume_keywords']) & set(keywords['job_keywords']))
     }
 
-# Example usage
-if __name__ == "__main__":
-    job_text = extract_text_from_file("Screenshotpdf.pdf")
-    resume_text = extract_text_from_file("Resume.pdf")
-    
-    scores = calculate_scores(job_text, resume_text)
-    print("\nFinal Scores:")
-    print(f"Keyword Match: {scores['raw_keyword_score']:.1f}%")
-    print(f"Vector Similarity: {scores['raw_vector_score']:.1f}%")
-    print(f"Weighted Total: {scores['total_score']:.1f}%")
-    print(f"Matched Keywords: {', '.join(scores['matched_keywords'])}")

@@ -7,17 +7,19 @@ pillow
 python-magic
 scikit-learn
 nltk
-# Core dependencies
 fastapi
 uvicorn
 python-dotenv
-motor
+
 
 aio_pika
-# Messaging
-# Utilities
+
 tenacity
 aiofiles
+pymongo
+
+python-multipart
+python-dotenv
 
 # AI and Processing
 google-generativeai

@@ -5,9 +5,8 @@ import pytesseract
 from pdf2image import convert_from_path
 import pathlib
 import os
-pytesseract.pytesseract.tesseract_cmd = 'tesseract'
-# For Poppler (already in system PATH in Docker)
-POPPLER_PATH = '/usr/bin'  # Default system path in Linux containers
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+POPPLER_PATH = '/usr/bin'
 
 def extract_text_from_file(file_path):
 
@@ -37,13 +36,13 @@ def extract_text_from_file(file_path):
 
 
     elif ext in [".doc", ".docx"]:
-        # docx2txt extracts text from DOCX; DOC may need conversion
         file_content =docx2txt.process(file_path)
         return file_content
 
     elif ext in [".png", ".jpg", ".jpeg"]:
         image = Image.open(file_path)
-        # Use pytesseract to perform OCR on the image
         return pytesseract.image_to_string(image)
+    else:
+        return ''
 
     

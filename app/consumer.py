@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from config import Config
+from config_local import Config
 from screening import scoreResume
 from models import ApplicationResult
 import aio_pika
@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 executor = ThreadPoolExecutor()
 
 async def process_message(message: aio_pika.IncomingMessage):
-    async with message.process():  # Auto-ack/nack based on exceptions
+    async with message.process():  
         try:
             print("Processing message...")
             data = json.loads(message.body.decode())
@@ -27,11 +27,7 @@ async def process_message(message: aio_pika.IncomingMessage):
                 "application_id": data['application_id'],
                 "job_id": data['job_id'],
                 "final_score": round(final_score, 1),
-                "score_breakdown": {
-                    "llm_score": llm_output['overall_score'],
-                    "keyword_score": kw_score,
-                    "vector_score": vec_score
-                },
+                "score_breakdown": llm_output['score_breakdown'],
                 "details": llm_output
             }
 
@@ -46,16 +42,16 @@ async def process_message(message: aio_pika.IncomingMessage):
 
         except Exception as e:
             print(f"Error processing message: {e}")
-            raise  # Re-raise to ensure message is nacked/requeued
+            raise  
 
 async def consume_messages():
-    connection = await aio_pika.connect_robust(Config.RABBITMQ_URL)
+    connection = await aio_pika.connect_robust(url=Config.RABBITMQ_URL)
     channel = await connection.channel()
     queue = await channel.declare_queue(Config.QUEUE_NAME, durable=True)
     
     await queue.consume(process_message)
     print(" [*] Waiting for messages. To exit press CTRL+C")
-    await asyncio.Future()  # Run indefinitely
+    await asyncio.Future()  
 
 if __name__ == "__main__":
     asyncio.run(consume_messages())

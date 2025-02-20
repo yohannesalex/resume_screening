@@ -1,60 +1,3 @@
-# version: '3.8'
-
-# services:
-#   api:
-#     build: .
-#     ports:
-#       - "8000:8000"
-#     volumes:
-#       - shared_data:/shared_volume
-#     environment:
-#       UPLOAD_DIR: /shared_volume
-#       RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672/
-#       GEMINI_API_KEY: ${GEMINI_API_KEY}
-#       MONGO_URI: ${mongodb+srv://yohannesabdia:yohannes6460@cluster0.2almc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}  # Add MongoDB Atlas connection URI
-#     networks:
-#       - app-network
-#     depends_on:
-#       - rabbitmq
-#     restart: unless-stopped
-
-#   consumer:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile.consumer
-#     volumes:
-#       - shared_data:/shared_volume
-#     networks:
-#       - app-network
-#     environment:
-#       PYTHONPATH: ./app
-#       MONGO_URI: ${mongodb+srv://yohannesabdia:yohannes6460@cluster0.2almc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}  # Use MongoDB Atlas
-#     env_file:
-#       - .env
-#     depends_on:
-#       - rabbitmq
-#     restart: unless-stopped
-
-#   rabbitmq:
-#     image: rabbitmq:3-management
-#     volumes:
-#       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-#     networks:
-#       - app-network
-#     environment:
-#       RABBITMQ_DEFAULT_USER: admin
-#       RABBITMQ_DEFAULT_PASS: admin
-#     ports:
-#       - "5672:5672"
-#       - "15672:15672"
-#     restart: unless-stopped
-
-# volumes:
-#   shared_data:
-
-# networks:
-#   app-network:
-#     driver: bridge
 version: '3.8'
 
 services:
@@ -63,11 +6,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
-      - MONGODB_URL=${MONGODB_ATLAS_URL}  # From .env file
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - MONGODB_URL=${MONGODB_ATLAS_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - UPLOAD_DIR=/shared_volume
     volumes:
       - shared_volume:/shared_volume
+    restart: unless-stopped
     depends_on:
       - rabbitmq
 
@@ -75,21 +20,24 @@ services:
     build: .
     command: python consumer.py
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - MONGODB_URL=${MONGODB_ATLAS_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
       - shared_volume:/shared_volume
+    restart: unless-stopped
     depends_on:
       - rabbitmq
 
+
   rabbitmq:
-    image: rabbitmq:3.9-management
+    image: rabbitmq:4.0-management
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+   
 
 volumes:
   shared_volume:

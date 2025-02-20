@@ -5,14 +5,12 @@ import google.generativeai as genai
 from generate_job_requirement_values import analyze_job_requirements
 from file_reader import extract_text_from_file
 from vector_keyword_similarity import calculate_scores
-# Load environment variables
 load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY is not set in the environment variables!")
 
-# Configure the Gemini API with your API key
 genai.configure(api_key=gemini_api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
@@ -30,7 +28,7 @@ def balance_braces(json_str):
     if open_braces > close_braces:
         json_str += '}' * (open_braces - close_braces)
     return json_str
-
+# function to score the resume
 def scoreResume(requirement_file_path, resume_file_path):
     # Extract text from the file using appropriate library
     extracted_job_requirement = extract_text_from_file(requirement_file_path)
@@ -39,7 +37,7 @@ def scoreResume(requirement_file_path, resume_file_path):
     scores = calculate_scores(extracted_job_requirement, extracted_applicant_resume)
     keyword_weight = scores['weighted_keyword']
     vector_weight = scores['weighted_vector']
-    # Define your analysis prompt.
+    # prompt.
     prompt = f"""
 {{
   "task": "Evaluate applicant resume against weighted job requirements and provide scored analysis in JSON format. if the resume is a direct copy of job requirement give it 0 ",
@@ -107,6 +105,7 @@ def scoreResume(requirement_file_path, resume_file_path):
     "missing_criteria": ["Team leadership experience"]
   }},
   "rules": [
+    "the output format is strict"
     "Maintain mathematical consistency: ∑(weighted_scores) = overall_score",
     "Include specific resume quotes as evidence",
     "List at least 2 items per evidence/missing array",
@@ -135,7 +134,7 @@ def scoreResume(requirement_file_path, resume_file_path):
     else:
         raise ValueError("No valid JSON object found in the response.")
     
-    # Attempt to balance the braces and then parse.
+    # balance the braces and then parse.
     json_str = balance_braces(json_str)
     
     try:

@@ -1,24 +1,4 @@
-# FROM python:3.9-slim
 
-# WORKDIR /app
-
-# RUN apt-get update && apt-get install -y \
-#     poppler-utils \
-#     tesseract-ocr \
-#     libtesseract-dev \
-#     && rm -rf /var/lib/apt/lists/*
-
-# COPY requirements.txt .
-
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# # Copy the entire app directory
-# COPY /app .
-
-# # Set Python path
-# ENV PYTHONPATH=/app
-
-# CMD ["python", "-m", "consumer"]
 FROM python:3.9-slim
 
 WORKDIR /app
@@ -38,9 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install NLTK data
 RUN python -m nltk.downloader punkt stopwords wordnet omw-1.4
+RUN python -c "import nltk; nltk.download('punkt_tab')"
 
 # Copy application code
-COPY . .
+COPY /app .
 
 # Create shared volume directory
 RUN mkdir -p /shared_volume

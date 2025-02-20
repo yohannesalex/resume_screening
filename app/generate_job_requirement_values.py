@@ -5,23 +5,19 @@ import google.generativeai as genai
 from file_reader import extract_text_from_file
 
 
-# Load environment variables
 load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY is not set in the environment variables!")
 
-# Configure the Gemini API with your API key
 genai.configure(api_key=gemini_api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
-
+# function to identify the weights
 def analyze_job_requirements(file_path):
-    # Extract text from the file using appropriate library
     extracted_text = extract_text_from_file(file_path)
 
-    # Define your analysis prompt.
     prompt = f"""
 Analyze this job requirement file carefully. The file named "{file_path}" may be in any format 
 (text-based such as plain text, PDF, DOCX or image-based such as a scanned document). 
@@ -61,7 +57,6 @@ Extracted File Text:
 {extracted_text}
     """
 
-    # Generate content from Gemini using both the prompt and the uploaded file reference.
     response = model.generate_content(
         prompt, 
     )
