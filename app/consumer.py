@@ -3,11 +3,10 @@ import json
 import os
 from config_local import Config
 from screening import scoreResume
-from models import ApplicationResult
+from models import ResultDocument, JobDocument
 import aio_pika
 from concurrent.futures import ThreadPoolExecutor
 from generate_skill_for_interview import analyse_job_skills
-from file_reader import extract_text_from_file
 
 executor = ThreadPoolExecutor()
 
@@ -16,15 +15,17 @@ async def process_message(message: aio_pika.IncomingMessage):
         try:
             print("Processing message...")
             data = json.loads(message.body.decode())
-            print(f"Processing {data['job_requirements_path']}")
 
             # Score resume
-            llm_output, kw_score, vec_score = scoreResume(
-                data['job_requirements_path'],
+            
+            job_id = data["job_id"]
+            job_fetch = JobDocument.getJob_by_id(job_id)
+            job_text = job_fetch['job_requirements']
+            skill_fetch = analyse_job_skills(job_text)
+            llm_output, kw_score, vec_score , parsed_resume= scoreResume(
+                job_text,
                 data['resume_path']
             )
-            job_text = extract_text_from_file(data['job_requirements_path'])
-            skill_fetch = analyse_job_skills(job_text)
             final_score = (llm_output['overall_score'] * 0.6) + kw_score + vec_score
 
             result = {
@@ -32,18 +33,17 @@ async def process_message(message: aio_pika.IncomingMessage):
                 "job_id": data['job_id'],
                 "final_score": round(final_score, 1),
                 "score_breakdown": llm_output['score_breakdown'],
-                "details": llm_output,
-                "required_skills": skill_fetch
+                "required_skills": skill_fetch,
+                "parsed_resume":parsed_resume
             }
 
             # Save to MongoDB
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(executor, ApplicationResult.create, result)
+            await loop.run_in_executor(executor, ResultDocument.create, result)
 
             # Cleanup files
-            for path in [data['resume_path'], data['job_requirements_path']]:
-                if os.path.exists(path):
-                    os.remove(path)
+            if os.path.exists(data['resume_path']):
+                os.remove(data['resume_path'])
 
         except Exception as e:
             print(f"Error processing message: {e}")

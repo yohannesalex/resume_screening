@@ -29,12 +29,11 @@ def balance_braces(json_str):
         json_str += '}' * (open_braces - close_braces)
     return json_str
 # function to score the resume
-def scoreResume(requirement_file_path, resume_file_path):
+def scoreResume(requirement_text, resume_file_path):
     # Extract text from the file using appropriate library
-    extracted_job_requirement = extract_text_from_file(requirement_file_path)
     extracted_applicant_resume = extract_text_from_file(resume_file_path)
-    weight = analyze_job_requirements(extracted_job_requirement)
-    scores = calculate_scores(extracted_job_requirement, extracted_applicant_resume)
+    weight = analyze_job_requirements(requirement_text)
+    scores = calculate_scores(requirement_text, extracted_applicant_resume)
     keyword_weight = scores['weighted_keyword']
     vector_weight = scores['weighted_vector']
     # prompt.
@@ -42,7 +41,7 @@ def scoreResume(requirement_file_path, resume_file_path):
 {{
   "task": "Evaluate applicant resume against weighted job requirements and provide scored analysis in JSON format. if the resume is a direct copy of job requirement give it 0 ",
   "inputs": {{
-    "job_requirements": "{extracted_job_requirement}",
+    "job_requirements": "{requirement_text}",
     "applicant_resume": "{extracted_applicant_resume}",
     "weights": {weight}
   }},
@@ -141,6 +140,6 @@ def scoreResume(requirement_file_path, resume_file_path):
         result = json.loads(json_str)
     except json.JSONDecodeError as e:
         raise ValueError(f"Error decoding JSON: {e}\nExtracted text: {json_str}")
-    return result , keyword_weight , vector_weight
+    return result , keyword_weight , vector_weight, extracted_applicant_resume
 
 

@@ -16,48 +16,52 @@ genai.configure(api_key=gemini_api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
 # function to identify the weights
+import re
+import json
+
 def analyse_job_skills(job_requirement_text):
-    prompt = f"""
-Analyze this job requirement and output a JSON dictionary of required skills categorized by importance (High/Medium/Low). Follow these rules:  
-1. High = Explicitly required or repeated  
-2. Medium = Mentioned as "preferred" or "nice-to-have"  
-3. Low = Implied by context but not directly stated  
-4. Use simple skill names (e.g., "Python" not "Python programming")  
-5. Exclude generic terms like "communication skills"  
-6. Output only raw JSON without formatting  
-7. Return valid JSON only (no markdown or additional text)
+    prompt = (
+        '{'
+        '"You are a helpful assistant that extracts and categorizes skills from a given job_requirement_text. '
+        'Your task is to analyze the job_requirement_text and identify the top 5 most relevant skills. '
+        'For each skill, determine the required proficiency level as either "beginner", "intermediate", or "expert" '
+        'based on the context. Return the response in JSON format, with each skill as a key and its required level as '
+        'a value in a nested dictionary. Use the following structure:'
+        '\n\n'
+        '{'
+        '  "skill_name": {'
+        '    "required_level": "beginner/intermediate/expert"'
+        '  }'
+        '}'
+        '\n\n'
+        f'Here is the job_requirement_text to analyze:\n{job_requirement_text}\n\n'
+        'Provide only the JSON output. Do not include any additional explanations or text.'
+        '}'
+    )
 
-Example Input:  
-"Looking for a developer with Python expertise, basic SQL knowledge, and REST API experience. Docker experience preferred."  
-
-Example Output:  
-{{"Python": "High", "SQL": "Medium", "REST APIs": "High", "Docker": "Medium"}}  
-
-Job Requirement to Analyze:  
-{job_requirement_text}
-"""
-
-    # Rest of your code remains the same
+    # Generate content from the model
     response = model.generate_content(
-        prompt, 
+        prompt,
         generation_config={
             "temperature": 0.1,
             "top_p": 0.95,
         }
     )
-    
+
+    # Extract JSON response
     response_text = response.text.replace('```json', '').replace('```', '').strip()
-    
+
     match = re.search(r'\{.*\}', response_text, re.DOTALL)
     if match:
         json_str = match.group(0)
     else:
         raise ValueError("No valid JSON object found in the response.")
-    
+
     json_str = balance_braces(json_str)
-    
+
     try:
         result = json.loads(json_str)
     except json.JSONDecodeError as e:
         raise ValueError(f"Error decoding JSON: {e}\nExtracted text: {json_str}")
+
     return result
