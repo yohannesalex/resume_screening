@@ -29,13 +29,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      redis:
-        condition: service_started
-
-
-  redis:
-    image: redis
-
+    
 
 
   rabbitmq:
@@ -49,7 +43,7 @@ services:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
       retries: 5
-      start_period: 30s
+      start_period: 10s
       timeout: 10s
 
    
