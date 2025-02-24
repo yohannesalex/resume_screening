@@ -27,7 +27,15 @@ services:
       - shared_volume:/shared_volume
     restart: unless-stopped
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+
+  redis:
+    image: redis
+
 
 
   rabbitmq:
@@ -37,6 +45,13 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
    
 
 volumes:
